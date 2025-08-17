@@ -1,465 +1,171 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="mobile-web-app-capable" content="yes">
-  <title>かんたん会計（文化祭版・横幅統一＋右側コンパクト）</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>かんたん会計（文化祭版・スタティック）</title>
   <style>
-    :root{
-      --bg:#f7f7fb; --card:#fff; --text:#222; --muted:#666;
-      --accent:#3b82f6; --danger:#ef4444; --ok:#16a34a;
+    :root {
+      --bg: #f7f7fb;
+      --card: #ffffff;
+      --text: #222;
+      --muted: #666;
+      --accent: #3b82f6;
+      --danger: #ef4444;
+      --ok: #16a34a;
     }
-    *{box-sizing:border-box} html,body{-webkit-tap-highlight-color:transparent}
-    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;background:var(--bg);color:var(--text);touch-action:manipulation}
-    .container{max-width:1120px;margin:0 auto;padding:16px;display:grid;gap:16px;grid-template-columns:1.15fr 1fr}
-    header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center}
-    h1{margin:0;font-size:22px}
-    .badge{font-size:12px;background:#f1f5f9;border:1px dashed #cbd5e1;padding:4px 8px;border-radius:999px;color:#334155}
-    .card{background:var(--card);border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);padding:16px}
-    /* ---- 左：商品ボタン(行ごと) ---- */
-    .rows{display:flex;flex-direction:column;gap:12px}
-    .rowBtns{display:grid;gap:12px;grid-auto-rows:1fr} /* 各セル同じ高さに */
-    .row2{grid-template-columns:repeat(2,1fr)}
-    .row3{grid-template-columns:repeat(3,1fr)}
-    .btn{
-      display:flex;flex-direction:column;gap:6px;
-      align-items:center;justify-content:center;
-      border:2px solid transparent;border-radius:16px;
-      font-weight:800;font-size:22px;cursor:pointer;
-      background:#eef2ff;transition:transform .03s ease;user-select:none;
-      height:100%;          /* グリッドセルいっぱいに */
-      min-height:120px;     /* 最低高さを合わせる */
-      width:100%;           /* 横幅をセルにフィット */
-      padding:16px 12px;
-      text-align:center;
-    }
-    .btn:active{transform:translateY(1px) scale(.99)}
-    .btn .price{font-size:16px;font-weight:600;color:var(--muted)}
-    .note{font-size:12px;color:var(--muted)}
-    /* ---- 右：明細（初期試作サイズへ） ---- */
-    .right{display:grid;gap:16px;grid-template-rows:auto 1fr auto}
-    .list{max-height:380px;overflow:auto} /* 初期試作版のサイズに戻す */
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:8px 10px;text-align:left;font-size:16px}
-    thead th{position:sticky;top:0;background:#f0f3ff}
-    tbody tr:nth-child(odd){background:#fafbff}
-    .pill{border-radius:999px;padding:4px 10px;border:1px solid #e5e7eb;background:#fff;font-size:14px}
-    .pill.btn{background:#eef2ff;cursor:pointer}
-    .qtyCtrl{display:inline-flex;gap:6px;align-items:center}
-    .footer{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
-    .total{font-size:28px;font-weight:900;letter-spacing:.5px}
-    .big{font-size:36px;font-weight:900}
-    .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
-    input[type="number"],input[type="text"]{width:100%;padding:12px;border-radius:12px;border:1px solid #e5e7eb;font-size:18px}
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
-    .actionBtn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
-    .primary{background:var(--accent);color:#fff}
-    .danger{background:var(--danger);color:#fff}
-    .ok{background:var(--ok);color:#fff}
-    .muted{background:#e5e7eb}
-    .stickyBar{position:sticky;bottom:0;background:var(--card);padding-top:8px}
-    .small{font-size:12px;color:var(--muted)}
-    /* 会計確定ボタンは大きめのまま */
-    .checkoutBtn{font-size:28px;padding:16px 28px;border-radius:14px}
-    @media (max-width:900px){.container{grid-template-columns:1fr}}
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    .container { max-width: 1100px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; grid-template-columns: 1.2fr 1fr; }
+    header { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; }
+    h1 { font-size: 22px; margin: 0; }
+    .card { background: var(--card); border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); padding: 16px; }
+    .items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .btn { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px;
+           padding: 20px; font-weight: 700; font-size: 20px; cursor: pointer; background: #eef2ff; user-select: none;
+           width: 100%; height: 100px; }
+    .btn .price { font-size: 16px; font-weight: 600; color: var(--muted); }
+    .right { display: grid; gap: 16px; grid-template-rows: auto 1fr auto; }
+    .list { max-height: 300px; overflow: auto; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 6px 8px; text-align: left; font-size: 14px; }
+    thead th { position: sticky; top: 0; background: #f0f3ff; }
+    tbody tr:nth-child(odd) { background: #fafbff; }
+    .total { font-size: 24px; font-weight: 900; }
+    input[type="number"], input[type="text"] { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .actionBtn { padding: 10px 14px; border-radius: 8px; border: 0; cursor: pointer; font-weight: 700; }
+    .primary { background: var(--accent); color: #fff; }
+    .danger { background: var(--danger); color: #fff; }
+    .ok { background: var(--ok); color: #fff; font-size: 18px; padding: 16px 24px; }
+    .muted { background: #e5e7eb; }
+    .pill { border-radius: 999px; padding: 2px 8px; border: 1px solid #ccc; background: #fff; font-size: 12px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .small { font-size: 12px; color: var(--muted); }
+    @media (max-width: 900px) { .container { grid-template-columns: 1fr; } .items { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .items { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>かんたん会計（文化祭版） <span class="badge" id="syncStatus">オフライン保存中</span></h1>
+      <h1>かんたん会計（文化祭版・スタティック）</h1>
       <div class="actions">
-        <button class="actionBtn muted" id="manageItems">商品編集</button>
-        <button class="actionBtn primary" id="saveLayout">設定保存</button>
-        <button class="actionBtn ok" id="syncExcel">共有シートへ同期</button>
+        <button class="actionBtn ok" id="downloadCsv">CSVダウンロード</button>
       </div>
     </header>
 
-    <!-- 左：商品ボタン（行単位で構成） -->
+    <!-- 左側 商品ボタン -->
     <section class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="note">タップで追加 / 長押しで数量入力（iPad対応）</div>
-        <div class="small">今日: <span id="today"></span></div>
-      </div>
-      <div class="rows" id="itemRows"></div>
+      <div class="items" id="items"></div>
     </section>
 
-    <!-- 右：会計エリア（コンパクト版） -->
+    <!-- 右側 会計エリア -->
     <section class="right">
       <div class="card list">
         <table>
-          <thead><tr>
-            <th style="width:40%">品名</th><th>単価</th><th>数量</th><th>小計</th><th></th>
-          </tr></thead>
+          <thead>
+            <tr>
+              <th>品名</th><th>単価</th><th>数量</th><th>小計</th>
+            </tr>
+          </thead>
           <tbody id="cartBody"></tbody>
         </table>
       </div>
-
       <div class="card">
-        <div class="row">
-          <div class="total">合計：<span class="big" id="grandTotal">¥0</span></div>
-          <div class="actions" style="justify-content:flex-end">
-            <button class="actionBtn muted" id="undoBtn">1つ戻す</button>
-            <button class="actionBtn danger" id="clearBtn">クリア</button>
-          </div>
-        </div>
-        <div class="footer" style="margin-top:10px">
-          <div>
-            <label class="small">いただいた金額</label>
-            <input type="number" id="paidInput" inputmode="numeric" placeholder="0" />
-          </div>
-          <div>
-            <label class="small">お釣り</label>
-            <input type="text" id="changeOut" readonly />
-          </div>
+        <div class="total">合計：<span id="grandTotal">¥0</span></div>
+        <div class="grid2" style="margin-top:10px">
+          <div><label class="small">いただいた金額</label><input type="number" id="paidInput" inputmode="numeric" placeholder="0"></div>
+          <div><label class="small">お釣り</label><input type="text" id="changeOut" readonly></div>
         </div>
       </div>
-
-      <div class="card stickyBar">
-        <div class="row">
-          <div>
-            <div class="small">売上個数（本セッション）</div>
-            <div id="salesCounts" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-          </div>
-          <div class="actions" style="justify-content:flex-end">
-            <button class="actionBtn ok checkoutBtn" id="checkoutBtn">会計 確定</button>
-          </div>
-        </div>
+      <div class="card">
+        <button class="actionBtn ok" id="checkoutBtn">会計 確定</button>
       </div>
     </section>
   </div>
 
   <script>
-    /* ======================================================
-       設定：どちらで同期するか選ぶ
-       "GAS" = Google スプレッドシート（Apps Script WebAPI）
-       "GRAPH" = SharePoint/OneDriveのExcel（MS Graph、要MSAL設定）
-    ====================================================== */
-    const SYNC_MODE = "GAS"; // "GAS" or "GRAPH"
-
-    // ★GASを使う場合：ここに Apps Script のデプロイURLを入れる
-    const GAS_URL = ""; // 例: https://script.google.com/macros/s/XXXX/exec
-
-    // ★Graphを使う場合：管理者同意後に設定
-    const MSAL_CONFIG = {
-      auth: {
-        clientId: "", // アプリ(クライアント)ID
-        authority: "https://login.microsoftonline.com/",
-        redirectUri: window.location.origin + window.location.pathname
-      },
-      cache: { cacheLocation: "localStorage" }
-    };
-    const GRAPH_SCOPES = ["Files.ReadWrite","offline_access"];
-    const EXCEL_FILE_PATH = "/SalesJournal.xlsx";
-    const EXCEL_TABLE_NAME = "SalesJournal";
-
-    /* ============= メニュー定義（行ごとに表示） =============
-       ① ベリールージュ 160, ラグーンブルー 160
-       ② レインボー 270, クッキー＆クリーム 270, ハニーコットン 270
-       ③ チュロス 220, 唐揚げ 120
-    ========================================================== */
-    const defaultRows = [
-      [
-        { id:"berry_rouge",  name:"ベリールージュ",     price:160 },
-        { id:"lagoon_blue",  name:"ラグーンブルー",     price:160 }
-      ],
-      [
-        { id:"rainbow",      name:"レインボー",         price:270 },
-        { id:"cookiescream", name:"クッキー＆クリーム", price:270 },
-        { id:"honey_cotton", name:"ハニーコットン",     price:270 }
-      ],
-      [
-        { id:"churros",      name:"チュロス",           price:220 },
-        { id:"karaage",      name:"唐揚げ",             price:120 }
-      ]
+    const itemsData = [
+      {id:'A', name:'ベリールージュ', price:160},
+      {id:'B', name:'ラグーンブルー', price:160},
+      {id:'C', name:'レインボー', price:270},
+      {id:'D', name:'クッキー＆クリーム', price:270},
+      {id:'E', name:'ハニーコットン', price:270},
+      {id:'F', name:'チュロス', price:220},
+      {id:'G', name:'唐揚げ', price:120}
     ];
 
-    // ストレージにItemsを持たせておく（編集対応）
-    const state = {
-      rows: load('rows') || defaultRows,
-      cart: [],
-      history: [],
-      sales: load('sales') || {} // {id: 個数}
-    };
-
-    function save(k,v){ localStorage.setItem('pos_'+k, JSON.stringify(v)); }
-    function load(k){ try{ return JSON.parse(localStorage.getItem('pos_'+k)); }catch(e){ return null; } }
-    function yen(n){ return '¥'+(n||0).toLocaleString('ja-JP'); }
-
-    document.getElementById('today').textContent =
-      new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'});
-
-    // --- ボタン描画（行ごと） ---
-    function renderItemRows(){
-      const wrap = document.getElementById('itemRows');
-      wrap.innerHTML = '';
-      state.rows.forEach((row, idx)=>{
-        const rowDiv = document.createElement('div');
-        rowDiv.className = 'rowBtns ' + (row.length===2?'row2':'row3');
-        row.forEach(item=>{
-          const btn = document.createElement('button');
-          btn.className = 'btn';
-          btn.innerHTML = `<div>${item.name}</div><div class="price">${yen(item.price)}</div>`;
-          btn.addEventListener('click', ()=>addToCart(item.id,1));
-          addLongPress(btn, ()=>{
-            const qty = parseInt(prompt(`${item.name} の数量を入力`,'1')||'0',10);
-            if(qty>0) addToCart(item.id, qty);
-          });
-          rowDiv.appendChild(btn);
-        });
-        wrap.appendChild(rowDiv);
+    let cart = [];
+    function yen(n){ return '¥' + n.toLocaleString('ja-JP'); }
+    function renderItems(){
+      const wrap=document.getElementById('items');
+      wrap.innerHTML='';
+      itemsData.forEach(it=>{
+        const btn=document.createElement('button');
+        btn.className='btn';
+        btn.innerHTML=`<div>${it.name}</div><div class="price">${yen(it.price)}</div>`;
+        btn.onclick=()=>addToCart(it);
+        wrap.appendChild(btn);
       });
-      renderSalesCounts();
     }
-
-    function flatItems(){ return state.rows.flat(); }
-
-    function addToCart(itemId, qty=1){
-      const item = flatItems().find(i=>i.id===itemId);
-      if(!item) return;
-      const row = state.cart.find(r=>r.id===itemId);
-      if(row) row.qty += qty;
-      else state.cart.push({ id:item.id, name:item.name, price:item.price, qty });
-      state.history.push({type:'add', id:itemId, qty});
+    function addToCart(it){
+      const row=cart.find(r=>r.id===it.id);
+      if(row) row.qty++;
+      else cart.push({...it, qty:1});
       renderCart();
     }
-
-    function computeTotal(){ return state.cart.reduce((s,r)=>s+r.price*r.qty,0); }
-
+    function computeTotal(){return cart.reduce((s,r)=>s+r.price*r.qty,0);}
     function renderCart(){
-      const body = document.getElementById('cartBody'); body.innerHTML='';
-      state.cart.forEach(r=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.name}</td>
-          <td>${yen(r.price)}</td>
-          <td>
-            <div class="qtyCtrl">
-              <button class="pill btn" onclick="changeQty('${r.id}', -1)">－</button>
-              <span class="pill">${r.qty}</span>
-              <button class="pill btn" onclick="changeQty('${r.id}', 1)">＋</button>
-            </div>
-          </td>
-          <td>${yen(r.price*r.qty)}</td>
-          <td><button class="pill btn" onclick="deleteLine('${r.id}')">削除</button></td>`;
+      const body=document.getElementById('cartBody'); body.innerHTML='';
+      cart.forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${r.name}</td><td>${yen(r.price)}</td><td>${r.qty}</td><td>${yen(r.price*r.qty)}</td>`;
         body.appendChild(tr);
       });
-      document.getElementById('grandTotal').textContent = yen(computeTotal());
+      document.getElementById('grandTotal').textContent=yen(computeTotal());
       updateChange();
     }
-    window.changeQty = (id,diff)=>{
-      const row = state.cart.find(r=>r.id===id); if(!row) return;
-      row.qty += diff;
-      if(row.qty<=0){ state.cart = state.cart.filter(r=>r.id!==id); }
-      state.history.push({type: diff>0?'add':'remove', id, qty:Math.abs(diff)});
-      renderCart();
-    };
-    function deleteLine(id){
-      const row = state.cart.find(r=>r.id===id); if(!row) return;
-      state.cart = state.cart.filter(r=>r.id!==id);
-      state.history.push({type:'delete', id, qty:row.qty});
-      renderCart();
-    }
-
-    // お釣り
-    const paidInput = document.getElementById('paidInput');
-    const changeOut = document.getElementById('changeOut');
-    paidInput.addEventListener('input', updateChange);
+    const paidInput=document.getElementById('paidInput');
+    const changeOut=document.getElementById('changeOut');
+    paidInput.addEventListener('input',updateChange);
     function updateChange(){
-      const paid = parseInt(paidInput.value||'0',10);
-      const change = paid - computeTotal();
-      changeOut.value = change>=0 ? yen(change) : '不足：'+yen(-change);
+      const paid=parseInt(paidInput.value||'0',10);
+      const change=paid-computeTotal();
+      changeOut.value= change>=0 ? yen(change) : '不足:'+yen(-change);
     }
-
-    // Undo / クリア
-    document.getElementById('undoBtn').addEventListener('click', ()=>{
-      const last = state.history.pop(); if(!last) return;
-      if(last.type==='add'){ changeQty(last.id,-last.qty); state.history.pop(); }
-      else if(last.type==='remove'){ changeQty(last.id,last.qty); state.history.pop(); }
-      else if(last.type==='delete'){
-        const item = flatItems().find(i=>i.id===last.id);
-        state.cart.push({ id:item.id, name:item.name, price:item.price, qty:last.qty });
-        renderCart();
-      }
-    });
-    document.getElementById('clearBtn').addEventListener('click', ()=>{
-      if(confirm('カートを空にしますか？')){ state.cart=[]; state.history=[]; renderCart(); }
-    });
-
-    // 会計確定 → 売上個数/ジャーナル
-    document.getElementById('checkoutBtn').addEventListener('click', ()=>{
-      if(state.cart.length===0) return alert('カートが空です');
-      const paid = parseInt(paidInput.value||'0',10);
-      const total = computeTotal();
-      if(paid < total) return alert('お支払いが不足しています');
-
-      // 個数集計
-      state.cart.forEach(r=>{ state.sales[r.id]=(state.sales[r.id]||0)+r.qty; });
-      save('sales', state.sales); renderSalesCounts();
-
-      // ジャーナル追記（同期対象）
-      const journal = load('journal')||[];
+    document.getElementById('checkoutBtn').addEventListener('click',()=>{
+      if(cart.length===0) return alert('カートが空です');
+      const paid=parseInt(paidInput.value||'0',10);
+      const total=computeTotal();
+      if(paid<total) return alert('お支払いが不足しています');
+      const journal=JSON.parse(localStorage.getItem('journal')||'[]');
       journal.push({
-        ts: new Date().toISOString(),
-        lines: state.cart.map(r=>({id:r.id,name:r.name,price:r.price,qty:r.qty,subtotal:r.price*r.qty})),
-        total, paid, change: paid-total
+        ts:new Date().toISOString(),
+        lines:cart.map(r=>({id:r.id,name:r.name,price:r.price,qty:r.qty,subtotal:r.price*r.qty})),
+        total,paid,change:paid-total
       });
-      save('journal', journal);
-
-      // リセット
-      state.cart=[]; state.history=[]; paidInput.value=''; updateChange(); renderCart();
-      alert('会計を記録しました（同期ボタンで共有シートへ送信します）');
+      localStorage.setItem('journal',JSON.stringify(journal));
+      cart=[]; renderCart(); paidInput.value=''; updateChange();
+      alert('会計を記録しました');
     });
-
-    function renderSalesCounts(){
-      const wrap = document.getElementById('salesCounts'); wrap.innerHTML='';
-      flatItems().forEach(i=>{
-        const n = state.sales[i.id]||0;
-        const el = document.createElement('span'); el.className='pill'; el.textContent=`${i.name}: ${n}個`;
-        wrap.appendChild(el);
+    document.getElementById('downloadCsv').addEventListener('click',()=>{
+      const journal=JSON.parse(localStorage.getItem('journal')||'[]');
+      if(journal.length===0) return alert('データがありません');
+      let csv='Timestamp,ItemId,ItemName,Price,Qty,Subtotal,Total,Paid,Change\n';
+      journal.forEach(j=>{
+        j.lines.forEach(r=>{
+          csv+=`${j.ts},${r.id},${r.name},${r.price},${r.qty},${r.subtotal},${j.total},${j.paid},${j.change}\n`;
+        });
       });
-    }
-
-    // 商品編集（JSONで行ごと編集）
-    document.getElementById('manageItems').addEventListener('click', ()=>{
-      const json = prompt(
-        '商品をJSONで編集（行配列の中にボタン配列を入れます）\n例: [[{id:"a",name:"A",price:100},{...}], [...]]',
-        JSON.stringify(state.rows,null,2)
-      );
-      if(!json) return;
-      try{
-        const arr = JSON.parse(json);
-        if(!Array.isArray(arr)) throw new Error('配列ではありません');
-        arr.forEach(row=>{
-          if(!Array.isArray(row)) throw new Error('各行は配列である必要があります');
-          row.forEach(x=>{ if(!x.id||!x.name||typeof x.price!=="number") throw new Error('id/name/price が不正'); });
-        });
-        state.rows = arr; save('rows', state.rows); renderItemRows(); renderCart();
-      }catch(e){ alert('エラー: '+e.message); }
+      const blob=new Blob([csv],{type:'text/csv'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url; a.download='sales.csv'; a.click();
+      URL.revokeObjectURL(url);
+      if(confirm('記録を消去しますか？')) localStorage.removeItem('journal');
     });
-    document.getElementById('saveLayout').addEventListener('click', ()=>{
-      save('rows', state.rows); save('sales', state.sales);
-      alert('設定を保存しました（この端末のブラウザに保存）');
-    });
-
-    // ==== 同期ボタン ====
-    document.getElementById('syncExcel').addEventListener('click', async ()=>{
-      const journal = load('journal')||[];
-      if(journal.length===0) return alert('送信するデータがありません');
-      document.getElementById('syncStatus').textContent='同期中…';
-      try{
-        const ok = await uploadToSharedSheet(journal);
-        if(ok){
-          save('journal', []); // 送信済みに
-          document.getElementById('syncStatus').textContent='同期済み';
-          alert('同期しました');
-        }else{
-          document.getElementById('syncStatus').textContent='失敗';
-        }
-      }catch(err){
-        console.error(err);
-        document.getElementById('syncStatus').textContent='エラー';
-        alert('同期でエラーが発生しました（コンソール参照）');
-      }
-    });
-
-    async function uploadToSharedSheet(journal){
-      if(SYNC_MODE==="GAS"){
-        if(!GAS_URL){ alert('GAS_URL が未設定です'); return false; }
-        // シンプルリクエストにするため Content-Type は text/plain
-        const rows=[];
-        journal.forEach(entry=>{
-          entry.lines.forEach(line=>{
-            rows.push({
-              Timestamp: entry.ts,
-              ItemId: line.id,
-              ItemName: line.name,
-              Price: line.price,
-              Qty: line.qty,
-              Subtotal: line.subtotal,
-              Total: entry.total,
-              Paid: entry.paid,
-              Change: entry.change
-            });
-          });
-        });
-        const res = await fetch(GAS_URL, {
-          method:"POST",
-          headers:{ "Content-Type":"text/plain" },
-          body: JSON.stringify(rows)
-        });
-        return res.ok;
-      }else if(SYNC_MODE==="GRAPH"){
-        // ★MS Graph直書き：MSALでサインイン→Excelテーブルに行追加
-        if(!window.msal){
-          await new Promise((resolve,reject)=>{
-            const s=document.createElement('script');
-            s.src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js";
-            s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
-          });
-        }
-        const msalInst = new msal.PublicClientApplication(MSAL_CONFIG);
-        // サインイン or サイレント
-        let account = msalInst.getAllAccounts()[0];
-        if(!account){
-          await msalInst.loginPopup({ scopes: GRAPH_SCOPES });
-          account = msalInst.getAllAccounts()[0];
-        }
-        const tokenResp = await msalInst.acquireTokenSilent({ scopes: GRAPH_SCOPES, account })
-          .catch(()=>msalInst.acquireTokenPopup({ scopes: GRAPH_SCOPES }));
-        const accessToken = tokenResp.accessToken;
-
-        // 行データ成形
-        const values=[];
-        journal.forEach(entry=>{
-          entry.lines.forEach(line=>{
-            values.push([
-              entry.ts, line.id, line.name, line.price, line.qty, line.subtotal,
-              entry.total, entry.paid, entry.change
-            ]);
-          });
-        });
-
-        // OneDrive ルート基準でファイル取得 → rows/add
-        const url = `https://graph.microsoft.com/v1.0/me/drive/root:${encodeURI(EXCEL_FILE_PATH)}:/workbook/tables/${encodeURIComponent(EXCEL_TABLE_NAME)}/rows/add`;
-        const res = await fetch(url,{
-          method:"POST",
-          headers:{
-            "Authorization":"Bearer "+accessToken,
-            "Content-Type":"application/json"
-          },
-          body: JSON.stringify({ values })
-        });
-        if(!res.ok){
-          const t=await res.text(); console.error('Graph error',res.status,t);
-          alert('Graph同期エラー: '+res.status);
-          return false;
-        }
-        return true;
-      }else{
-        alert('SYNC_MODE が不正です'); return false;
-      }
-    }
-
-    // 初期描画
-    renderItemRows(); renderCart();
-
-    // iPad長押しヘルパ
-    function addLongPress(el, onLongPress, delay=550){
-      let timer=null;
-      const start=(e)=>{ if(e.type==='touchstart') e.preventDefault(); clearTimeout(timer);
-        timer=setTimeout(()=>{ onLongPress(); timer=null; }, delay); };
-      const cancel=()=>{ if(timer){ clearTimeout(timer); timer=null; } };
-      el.addEventListener('mousedown',start);
-      el.addEventListener('mouseup',cancel);
-      el.addEventListener('mouseleave',cancel);
-      el.addEventListener('touchstart',start,{passive:false});
-      el.addEventListener('touchend',cancel);
-      el.addEventListener('touchcancel',cancel);
-    }
+    renderItems(); renderCart();
   </script>
 </body>
 </html>
